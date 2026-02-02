@@ -2,7 +2,7 @@
 
 A premium, mobile-responsive financial tracking web application built with Python (Flask) and Google Sheets. Designed specifically for ease of use across all generations.
 
-## ✨ Features
+## Features
 
 - **Full CRUD**: Create, Read, Update, and Delete income and outcome transactions.
 - **Premium UI**: Modern glassmorphic design with smooth animations.
@@ -12,7 +12,7 @@ A premium, mobile-responsive financial tracking web application built with Pytho
 - **Excel Export**: Export all records to `.xlsx` with an automated balance summary.
 - **Success Notifications**: Instant visual feedback for every transaction addition.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Prerequisites
 - Python 3.12
@@ -37,13 +37,13 @@ python app.py
 ```
 Open `http://127.0.0.1:5000` in your browser.
 
-## 🛠 Tech Stack
+## Tech Stack
 - **Backend/Frontend**: Flask (Python)
 - **Database**: Google Sheets (via `gspread`)
 - **UI/UX**: HTML5, CSS3 (Glassmorphism), Vanilla JS
 - **Export**: pandas & openpyxl
 
-## 💡 Usage Tips
+## Usage Tips
 - Toggle **Jenis Transaksi** (Pemasukan/Pengeluaran) to color-code your entries.
 - Use the **Export** button at the top of the history list to generate a summary report.
 - The app is fully responsive—bookmark the URL on your phone for easy entry on the go.

@@ -93,7 +93,7 @@ h1 {
 }
 
 .tab-btn:hover:not(.active) {
-    background: rgb(0, 0, 0);
+    background: var(--success);
     color: var(--text-main);
 }
 
