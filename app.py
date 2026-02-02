@@ -11,14 +11,14 @@ import io
 from flask import send_file, send_from_directory
 
 # Configure Logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
+# logging.basicConfig(
+#     level=logging.INFO,
+#     format='%(asctime)s [%(levelname)s] %(message)s',
+#     handlers=[
+#         logging.StreamHandler()
+#     ]
+# )
+# logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
