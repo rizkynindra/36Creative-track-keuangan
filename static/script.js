@@ -10,7 +10,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelBtn = document.getElementById('cancelBtn');
     const exportBtn = document.getElementById('exportBtn');
 
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
     let currentEditId = null;
+
+    // Tab Switching Logic
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
+            switchTab(targetTab);
+        });
+    });
+
+    function switchTab(tabName) {
+        // Update Buttons
+        tabBtns.forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-tab') === tabName);
+        });
+
+        // Update Contents
+        tabContents.forEach(content => {
+            content.classList.toggle('active', content.id === `${tabName}Section`);
+        });
+
+        // Load transactions if switching to history
+        if (tabName === 'history') {
+            loadTransactions();
+        }
+    }
 
     // Toast Notification
     function showToast(message) {
@@ -138,6 +166,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.textContent = 'Tambah Transaksi';
                 cancelBtn.style.display = 'none';
                 loadTransactions();
+
+                // Switch to history tab to show the result
+                setTimeout(() => {
+                    switchTab('history');
+                }, 500);
             }
         } catch (error) {
             console.error('Error saving transaction:', error);
@@ -159,6 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
             currentEditId = id;
             submitBtn.textContent = 'Update Transaction';
             cancelBtn.style.display = 'block';
+
+            // Switch to input tab for editing
+            switchTab('input');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
             console.error('Error fetching transaction for edit:', error);

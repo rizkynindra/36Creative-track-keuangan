@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>36Creative | Finance Tracker</title>
+    <title>36 Creative</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
     <!-- PWA & Mobile Meta Tags -->
@@ -28,81 +28,94 @@
             <p style="color: var(--text-muted);">Simpan Pengeluaran dan Pemasukan</p>
         </header>
 
-        <div class="grid">
-            <!-- Form Section -->
-            <div class="glass-card">
-                <h2 style="margin-bottom: 1.5rem;">Input Transaksi</h2>
-                <form id="transactionForm">
-                    <div class="form-group">
-                        <label for="type">Jenis Transaksi</label>
-                        <select id="type" name="type" required>
-                            <option value="income">Pemasukan</option>
-                            <option value="outcome">Pengeluaran</option>
-                        </select>
-                    </div>
+        <nav class="tab-menu">
+            <button class="tab-btn active" data-tab="input">
+                <i class="fas fa-plus-circle"></i> Input Transaksi
+            </button>
+            <button class="tab-btn" data-tab="history">
+                <i class="fas fa-history"></i> Riwayat Transaksi
+            </button>
+        </nav>
 
-                    <div class="form-group">
-                        <label for="detail">Detail Transaksi</label>
-                        <input type="text" id="detail" name="detail" placeholder="e.g. Beli Minyak Goreng" required>
-                    </div>
+        <div class="content-wrapper">
 
-                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div>
-                            <label for="price">Harga</label>
-                            <input type="number" id="price" name="price" placeholder="0" required min="0">
+            <div class="grid">
+                <!-- Form Section -->
+                <div id="inputSection" class="glass-card tab-content active">
+                    <h2 style="margin-bottom: 1.5rem;">Input Transaksi</h2>
+                    <form id="transactionForm">
+                        <div class="form-group">
+                            <label for="type">Jenis Transaksi</label>
+                            <select id="type" name="type" required>
+                                <option value="income">Pemasukan</option>
+                                <option value="outcome">Pengeluaran</option>
+                            </select>
                         </div>
-                        <div>
-                            <label for="qty">Jumlah</label>
-                            <input type="number" id="qty" name="qty" placeholder="1" value="1" required min="1">
+
+                        <div class="form-group">
+                            <label for="detail">Detail Transaksi</label>
+                            <input type="text" id="detail" name="detail" placeholder="e.g. Beli Minyak Goreng" required>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Total Harga</label>
-                        <div id="totalDisplay" style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">Rp 0
+                        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label for="price">Harga</label>
+                                <input type="number" id="price" name="price" placeholder="0" required min="0">
+                            </div>
+                            <div>
+                                <label for="qty">Jumlah</label>
+                                <input type="number" id="qty" name="qty" placeholder="1" value="1" required min="1">
+                            </div>
                         </div>
-                        <input type="hidden" id="totalPrice" name="total_price" value="0">
-                    </div>
 
-                    <button type="submit" id="submitBtn">Tambah Transaksi</button>
-                    <button type="button" id="cancelBtn"
-                        style="display: none; background: transparent; border: 1px solid var(--border); margin-top: 0.5rem;">Cancel
-                        Update</button>
-                </form>
-            </div>
+                        <div class="form-group">
+                            <label>Total Harga</label>
+                            <div id="totalDisplay" style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">
+                                Rp 0
+                            </div>
+                            <input type="hidden" id="totalPrice" name="total_price" value="0">
+                        </div>
 
-            <!-- List Section -->
-            <div class="glass-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h2>Riwayat Transaksi</h2>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <button id="exportBtn" class="btn-icon" title="Export to Excel"
-                            style="width: auto; padding: 0.5rem 1rem; font-size: 0.875rem;">
-                            <i class="fas fa-file-export" style="margin-right: 0.5rem;"></i> Export
-                        </button>
-                        <div id="balance" style="font-size: 0.875rem; font-weight: 600;">Saldo: <span
-                                id="balanceAmount">Rp
-                                0</span></div>
-                    </div>
+                        <button type="submit" id="submitBtn">Tambah Transaksi</button>
+                        <button type="button" id="cancelBtn"
+                            style="display: none; background: transparent; border: 1px solid var(--border); margin-top: 0.5rem;">Cancel
+                            Update</button>
+                    </form>
                 </div>
-                <div id="transactionList" class="transaction-list">
-                    <!-- Transactions will be loaded here -->
-                    <div class="item-meta" style="text-align: center; padding: 2rem;">Loading transactions...</div>
+
+                <!-- List Section -->
+                <div id="historySection" class="glass-card tab-content">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2>Riwayat Transaksi</h2>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <button id="exportBtn" class="btn-icon" title="Export to Excel"
+                                style="width: auto; padding: 0.5rem 1rem; font-size: 0.875rem;">
+                                <i class="fas fa-file-export" style="margin-right: 0.5rem;"></i> Export To Excel
+                            </button>
+                            <div id="balance" style="font-size: 0.875rem; font-weight: 600;">Saldo: <span
+                                    id="balanceAmount">Rp
+                                    0</span></div>
+                        </div>
+                    </div>
+                    <div id="transactionList" class="transaction-list">
+                        <!-- Transactions will be loaded here -->
+                        <div class="item-meta" style="text-align: center; padding: 2rem;">Loading transactions...</div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(reg => console.log('Service Worker registered'))
-                    .catch(err => console.log('Service Worker registration failed', err));
-            });
-        }
-    </script>
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/service-worker.js')
+                        .then(reg => console.log('Service Worker registered'))
+                        .catch(err => console.log('Service Worker registration failed', err));
+                });
+            }
+        </script>
 </body>
 
 </html>
