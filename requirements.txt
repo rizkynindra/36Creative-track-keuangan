@@ -1,6 +1,7 @@
 numpy
 pandas
 openpyxl
-flask
+gunicorn
+Flask
 gspread
 oauth2client

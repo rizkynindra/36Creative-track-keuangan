@@ -1,5 +1,7 @@
 import os
 import uuid
+import json
+import logging
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 import gspread
@@ -7,7 +9,17 @@ from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 import io
 from flask import send_file, send_from_directory
-import os
+
+# Configure Logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler("app.log"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -22,26 +34,40 @@ SHEET_NAME = "Financial Tracker"
 def get_sheet():
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+        
+        # Try Loading from Env Var first (for Render deployment)
+        google_creds_json = os.environ.get("GOOGLE_CREDENTIALS")
+        
+        if google_creds_json:
+            logger.info("Loading Google Sheets credentials from environment variable")
+            creds_dict = json.loads(google_creds_json)
+            creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+        else:
+            logger.info("Loading Google Sheets credentials from credentials.json")
+            creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+            
         client = gspread.authorize(creds)
         
         try:
             sh = client.open(SHEET_NAME)
             sheet = sh.sheet1
+            logger.info(f"Successfully opened sheet: {SHEET_NAME}")
+            
             # Check if header exists, if not add it
             header = sheet.row_values(1)
             expected_header = ["id", "date", "type", "detail", "price", "qty", "total_price"]
             if not header or header != expected_header:
+                logger.warning("Header mismatch or missing. Re-inserting headers.")
                 sheet.insert_row(expected_header, 1)
             return sheet
         except gspread.SpreadsheetNotFound:
+            logger.info(f"Sheet {SHEET_NAME} not found. Creating new sheet.")
             sh = client.create(SHEET_NAME)
-            # You might need to share with your personal email too if you want to see it
             sheet = sh.sheet1
             sheet.append_row(["id", "date", "type", "detail", "price", "qty", "total_price"])
             return sheet
     except Exception as e:
-        print(f"Google Sheets Error: {e}")
+        logger.error(f"Google Sheets Error: {e}", exc_info=True)
         return None
 
 @app.route('/')
@@ -115,6 +141,7 @@ def add_transaction():
         data.get('total_price')
     ]
     sheet.append_row(new_transaction)
+    logger.info(f"Transaction added: {data.get('type')} - {data.get('detail')} - Rp {data.get('total_price')}")
     return jsonify({"status": "success"}), 201
 
 @app.route('/api/transactions/<id>', methods=['GET'])
@@ -151,6 +178,7 @@ def update_transaction(id):
     sheet.update_cell(row_idx, 6, data.get('qty'))
     sheet.update_cell(row_idx, 7, data.get('total_price'))
     
+    logger.info(f"Transaction updated: {id}")
     return jsonify({"status": "updated"})
 
 @app.route('/api/transactions/<id>', methods=['DELETE'])
@@ -164,6 +192,7 @@ def delete_transaction(id):
         return jsonify({"error": "Not found"}), 404
     
     sheet.delete_rows(cell.row)
+    logger.info(f"Transaction deleted: {id}")
     return jsonify({"status": "deleted"})
 
 @app.route('/api/export', methods=['GET'])
@@ -218,4 +247,5 @@ def export_transactions():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
+    logger.info("Starting Finance Tracker App on port 3636")
     app.run(debug=True, port=3636, host='0.0.0.0')
