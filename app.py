@@ -32,9 +32,11 @@ def get_sheet():
         google_creds_json = os.environ.get("GOOGLE_CREDENTIALS")
         
         if google_creds_json:
+            print("Found GOOGLE_CREDENTIALS environment variable.")
             creds_dict = json.loads(google_creds_json)
             creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
         else:
+            print("GOOGLE_CREDENTIALS environment variable NOT found. Trying credentials.json...")
             creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
             
         client = gspread.authorize(creds)
