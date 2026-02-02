@@ -44,8 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/api/transactions');
             const data = await response.json();
+
             renderTransactions(data.transactions);
-            updateBalance(data.transactions);
+            updateBalance(data.total_balance);
         } catch (error) {
             console.error('Error loading transactions:', error);
             transactionList.innerHTML = '<div class="item-meta">Failed to load transactions.</div>';
@@ -64,13 +65,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const qty = parseFloat(t.qty) || 0;
             const totalPrice = parseFloat(t.total_price) || 0;
 
+            // Format Date: dd-mm-yyyy
+            let formattedDate = '-';
+            if (t.date) {
+                try {
+                    const d = new Error().stack.includes('loadTransactions') ? new Date(t.date) : new Date(t.date.replace(' ', 'T'));
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const year = d.getFullYear();
+                    formattedDate = `${day}-${month}-${year}`;
+                } catch (e) {
+                    formattedDate = t.date.split(' ')[0] || '-';
+                }
+            }
+
             return `
                 <div class="transaction-item">
                     <div class="item-info">
                         <div class="item-title">${t.detail || 'Untitled'}</div>
                         <div class="item-meta">
                             <span class="badge ${isIncome ? 'badge-income' : 'badge-outcome'}">${t.type || 'unknown'}</span>
-                            • ${price.toLocaleString('id-ID')} x ${qty}
+                            • <i class="far fa-calendar-alt" style="font-size: 0.75rem; margin-right: 2px;"></i> ${formattedDate}
                         </div>
                     </div>
                     <div style="text-align: right; margin-right: 1.5rem;">
@@ -91,10 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    function updateBalance(transactions) {
-        const balance = transactions.reduce((acc, t) => {
-            return t.type === 'income' ? acc + t.total_price : acc - t.total_price;
-        }, 0);
+    function updateBalance(balance) {
         balanceAmount.textContent = `Rp ${balance.toLocaleString('id-ID')}`;
         balanceAmount.className = balance >= 0 ? 'income' : 'outcome';
     }

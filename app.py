@@ -6,9 +6,14 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 import io
-from flask import send_file
+from flask import send_file, send_from_directory
+import os
 
 app = Flask(__name__)
+
+@app.route('/service-worker.js')
+def service_worker():
+    return send_from_directory('static', 'service-worker.js', mimetype='application/javascript')
 
 # Google Sheets Setup
 # NOTE: User needs to provide credentials.json and share the sheet with the service account email
@@ -55,11 +60,13 @@ def get_transactions():
         all_values = sheet.get_all_values()
         
         if len(all_values) <= 1:
-            return jsonify({"transactions": []})
+            return jsonify({"transactions": [], "total_balance": 0})
             
-        # Skip header row and map to expected keys
+        all_rows = all_values[1:]
         transactions = []
-        for row in all_values[1:]:
+        total_balance = 0
+        
+        for row in all_rows:
             # Pad row if columns are missing
             while len(row) < len(expected_keys):
                 row.append("")
@@ -70,6 +77,12 @@ def get_transactions():
                 t['price'] = float(t['price']) if t['price'] else 0
                 t['qty'] = float(t['qty']) if t['qty'] else 0
                 t['total_price'] = float(t['total_price']) if t['total_price'] else 0
+                
+                # Update balance
+                if t['type'] == 'income':
+                    total_balance += t['total_price']
+                else:
+                    total_balance -= t['total_price']
             except ValueError:
                 t['price'] = 0
                 t['qty'] = 0
@@ -77,7 +90,10 @@ def get_transactions():
                 
             transactions.append(t)
             
-        return jsonify({"transactions": list(reversed(transactions))})
+        return jsonify({
+            "transactions": list(reversed(transactions)),
+            "total_balance": total_balance
+        })
     except Exception as e:
         print(f"Error fetching records: {e}")
         return jsonify({"transactions": [], "error": str(e)}), 500
