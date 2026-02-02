@@ -27,6 +27,10 @@ app = Flask(__name__)
 def service_worker():
     return send_from_directory('static', 'service-worker.js', mimetype='application/javascript')
 
+@app.route('/health')
+def health():
+    return jsonify({"status": "healthy", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}), 200
+
 # Google Sheets Setup
 # NOTE: User needs to provide credentials.json and share the sheet with the service account email
 SHEET_NAME = "Financial Tracker"
