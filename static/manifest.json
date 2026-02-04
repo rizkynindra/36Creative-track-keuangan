@@ -2,23 +2,24 @@
     "name": "36Creative Finance Tracker",
     "short_name": "36Finance",
     "description": "Premium Financial Tracking System for 36Creative",
-    "start_url": "/",
+    "start_url": "https://36-creative-track-keuangan.vercel.app/",
     "display": "standalone",
     "background_color": "#0f172a",
     "theme_color": "#10b981",
     "orientation": "portrait",
     "icons": [
         {
-            "src": "/static/icons/icon-192x192.png",
+            "src": "static/icons/ICON_APPS_192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/static/icons/icon-512x512.png",
+            "src": "static/icons/ICON_APPS_512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
         }
-    ]
+    ],
+    "dir": "auto"
 }
